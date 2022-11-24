@@ -655,16 +655,17 @@ class Trader_PRZI(Trader):
         return string
 
 
-    def __init__(self, ttype, tid, balance, params, time):
+    def __init__(self, ttype, tid, balance, params, time): #EDITED
         # if params == "landscape-mapper" then it generates data for mapping the fitness landscape
 
-        verbose = True
+        verbose = False #EDITED
 
         Trader.__init__(self, ttype, tid, balance, params, time)
 
         # unpack the params
         if type(params) is dict:
             k = params['k']
+            f = params['F'] #EDITED
             optimizer = params['optimizer']
             s_min = params['strat_min']
             s_max = params['strat_max']
@@ -675,6 +676,7 @@ class Trader_PRZI(Trader):
 
         self.optmzr = optimizer     # this determines whether it's PRZI, PRSH, or PRDE
         self.k = k                  # number of sampling points (cf number of arms on a multi-armed-bandit, or pop-size)
+        self.f = f #EDITED
         self.theta0 = 100           # threshold-function limit value
         self.m = 4                  # tangent-function multiplier
         self.strat_wait_time = 7200     # how many secs do we give any one strat before switching?
@@ -694,7 +696,7 @@ class Trader_PRZI(Trader):
                          's0_index': self.active_strat,    # s0 starts out as active strat
                          'snew_index': self.k,             # (k+1)th item of strategy list is DE's new strategy
                          'snew_stratval': None,            # assigned later
-                         'F': 0.8                          # differential weight -- usually between 0 and 2
+                         'F': self.f                          # differential weight -- usually between 0 and 2 #EDITED
         }
 
         start_time = time
@@ -739,6 +741,7 @@ class Trader_PRZI(Trader):
 
         if verbose:
             print("%s\n" % self.strat_str())
+            print(self.f) #EDITED
 
 
     def getorder(self, time, countdown, lob):
@@ -1174,7 +1177,7 @@ class Trader_PRZI(Trader):
             # only initiate diff-evol once the active strat has been evaluated for long enough
             actv_lifetime = time - self.strats[self.active_strat]['start_t']
             if actv_lifetime >= self.strat_wait_time:
-
+                # print(self.f) #EDITED
                 if self.k < 4:
                     sys.exit('FAIL: k too small for diffevol')
 
@@ -1581,13 +1584,17 @@ def populate_market(traders_spec, traders, shuffle, verbose):
                 # params determines type of optimizer used
                 if ttype == 'PRSH':
                     parameters = {'optimizer': 'PRSH', 'k': trader_params['k'],
-                                  'strat_min': trader_params['s_min'], 'strat_max': trader_params['s_max']}
+                                  'strat_min': trader_params['s_min'], 'strat_max': trader_params['s_max'], 'F': trader_params['F']} #EDITED (MIGHT NEED TO BE REMOVED)
                 elif ttype == 'PRDE':
                     parameters = {'optimizer': 'PRDE', 'k': trader_params['k'],
-                                  'strat_min': trader_params['s_min'], 'strat_max': trader_params['s_max']}
+                                  'strat_min': trader_params['s_min'], 'strat_max': trader_params['s_max'], 'F': trader_params['F']} #EDITED
+                    # print(trader_params['F']) #EDITED
+                    dumpfile = open('F_check.csv', 'w')
+                    dumpfile.write(str(trader_params['F']))
+                    dumpfile.close()
                 else: # ttype=PRZI
                     parameters = {'optimizer': None, 'k': 1,
-                                  'strat_min': trader_params['s_min'], 'strat_max': trader_params['s_max']}
+                                  'strat_min': trader_params['s_min'], 'strat_max': trader_params['s_max'], 'F': trader_params['F']} #EDITED (MIGHT NEED TO BE REMOVED)
 
         return parameters
 
@@ -1920,6 +1927,10 @@ def market_session(sess_id, starttime, endtime, trader_spec, order_schedule, avg
     # create a bunch of traders
     traders = {}
     trader_stats = populate_market(trader_spec, traders, True, populate_verbose)
+                        # print(trader_params['F']) #EDITED
+    # dumpfile = open('F_check.csv', 'w') #EDITED
+    # dumpfile.write(str(trader_spec['F']))
+    # dumpfile.close()
 
     # timestep set so that can process all traders in one second
     # NB minimum interarrival time of customer orders may be much less than this!!
