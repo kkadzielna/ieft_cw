@@ -148,3 +148,20 @@ def plot_offset_fn(offset_fn, total_time_seconds):
     for i in range(total_time_seconds):
         offsets.append(offset_fn(i))
     plt.plot(x, offsets, 'x', color='black')  
+
+def plot_offset_and_sd(supply_demand_range, offset_fn, time_seconds, total_time): 
+    x = list(range(total_time))
+    passed_time = 0
+    i = 0
+    while i < len(supply_demand_range):
+        offsets_min = []
+        offsets_max = []
+        for j in range(time_seconds[i]):
+            offsets_min.append(offset_fn[i](j)+supply_demand_range[i][0])
+            offsets_max.append(offset_fn[i](j)+supply_demand_range[i][1])
+        time_range = list(range(time_seconds[i])) 
+        time_range = [n + passed_time for n in time_range]
+        plt.plot( time_range, offsets_min, 'x', color='red')
+        plt.plot( time_range, offsets_max, 'x', color='blue')
+        passed_time = passed_time + time_seconds[i]
+        i = i + 1
