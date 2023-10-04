@@ -1,2 +1,5 @@
 ## The effect of Number in Population and Differential Weight parameter values on Parameterised Response Differential Evolution trading strategy performance
-PRDE is evaluated via a series of experiments ran on The Bristol Stock Exchange (https://github.com/davecliff/BristolStockExchange)
+An exploration of the impact of Number in Population and Differential Weight Parameter Values on
+Parameterised Response Differential Evolution Trading Strategy Performance using [Bristol Stock Exchange](https://github.com/davecliff/BristolStockExchange), a simulation of a limit order book financial market developed by Dave Cliff.<br />
+A number of parameter configurations is tested under a set of different market conditions including homogeneous and heterogeneous trader populations and static and dynamic price equilibria. Having conducted rigorous statistical analysis of the the experiment results, I was not able to conclusively determine a superior value for either parameter.<br />
+The repository comprises of separate notebooks for running, statistical analysis, and the visualisation of the results from the experiments conducted in each set of market conditions, as well as the an implementation of The Bristol Stock Exchange, which has been modified to facilitate changing the originally hardcoded Differential Weight parameter value. 
